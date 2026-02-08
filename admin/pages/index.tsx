@@ -112,9 +112,14 @@ const Home: NextPage = () => {
           </div>
 
           <div style={{ marginTop: '32px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
-            <div style={{ padding: '20px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '1px solid #dbeafe' }}>
+            <div 
+              onClick={() => router.push('/quizzes')}
+              style={{ padding: '20px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '1px solid #dbeafe', cursor: 'pointer' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#dbeafe'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#eff6ff'}
+            >
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1e40af', marginBottom: '8px' }}>クイズ管理</h3>
-              <p style={{ fontSize: '14px', color: '#3b82f6' }}>準備中</p>
+              <p style={{ fontSize: '14px', color: '#3b82f6' }}>クリックして開く →</p>
             </div>
             
             <div style={{ padding: '20px', backgroundColor: '#f0fdf4', borderRadius: '8px', border: '1px solid #dcfce7' }}>
