@@ -1,53 +1,53 @@
 <template>
-  <div style="min-height: 100vh; background-color: #f3f4f6; font-family: Arial, sans-serif;">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
-      <header style="text-align: center; margin-bottom: 3rem;">
-        <h1 style="font-size: 2.5rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem;">
-          クイズメーカー
-        </h1>
-        <p style="font-size: 1.125rem; color: #4b5563;">
-          クイズを作成して、みんなで楽しもう！
-        </p>
-      </header>
+  <div>
+    <div class="mb-8">
+      <h1 class="text-4xl font-extrabold text-gray-800 mb-2">✨ 楽しいクイズに挑戦しよう！</h1>
+      <p class="text-gray-600">気になるクイズをクリックして挑戦してね</p>
+    </div>
 
-      <div style="max-width: 900px; margin: 0 auto;">
-        <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1.5rem;">
-          <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">利用可能な機能</h2>
-          <ul style="list-style: none; padding: 0;">
-            <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-              <span style="color: #10b981; margin-right: 0.5rem;">✓</span>
-              クイズの作成と編集
-            </li>
-            <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-              <span style="color: #10b981; margin-right: 0.5rem;">✓</span>
-              クイズの検索と閲覧
-            </li>
-            <li style="display: flex; align-items: center; margin-bottom: 0.5rem;">
-              <span style="color: #10b981; margin-right: 0.5rem;">✓</span>
-              クイズへの回答とスコア表示
-            </li>
-          </ul>
-        </div>
+    <div>
+      <div v-if="loading" class="text-center py-16">
+        <div class="text-6xl mb-4 animate-bounce">🎪</div>
+        <p class="text-purple-600 text-lg font-bold">読み込み中...</p>
+      </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
-          <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">クイズを探す</h3>
-            <p style="color: #4b5563; margin-bottom: 1rem;">
-              様々なジャンルのクイズから好きなものを選んで挑戦しよう
+      <div v-else-if="quizzes.length === 0" class="text-center py-16 bg-white rounded-3xl shadow-xl border-4 border-dashed border-purple-300">
+        <div class="text-6xl mb-4">📝</div>
+        <p class="text-gray-600 text-xl font-bold">公開されているクイズがまだありません</p>
+        <p class="text-gray-500 mt-2">もうすぐ楽しいクイズが登場するよ！</p>
+      </div>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div
+          v-for="(quiz, index) in quizzes"
+          :key="quiz.id"
+          class="quiz-card rounded-3xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer overflow-hidden"
+          :class="getCardColor(index)"
+          @click="goToQuiz(quiz.id)"
+        >
+          <div class="p-6 relative">
+            <div class="absolute top-4 right-4 text-3xl opacity-20">
+              {{ getEmoji(index) }}
+            </div>
+            <h2 class="text-2xl font-black text-gray-800 mb-3 relative z-10">
+              {{ quiz.title }}
+            </h2>
+            <p v-if="quiz.description" class="text-gray-700 text-sm mb-4 line-clamp-2 relative z-10">
+              {{ quiz.description }}
             </p>
-            <button style="width: 100%; background-color: #3b82f6; color: white; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.25rem; border: none; cursor: pointer;">
-              クイズ一覧へ
-            </button>
-          </div>
-
-          <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
-            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">クイズを作成</h3>
-            <p style="color: #4b5563; margin-bottom: 1rem;">
-              自分だけのオリジナルクイズを作成して共有しよう
-            </p>
-            <button style="width: 100%; background-color: #10b981; color: white; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.25rem; border: none; cursor: pointer;">
-              作成を始める
-            </button>
+            <div class="flex items-center justify-between text-sm mb-4">
+              <span class="bg-white bg-opacity-70 px-3 py-1 rounded-full font-semibold text-gray-700">
+                👤 {{ quiz.user.name }}
+              </span>
+              <span class="bg-white bg-opacity-70 px-3 py-1 rounded-full font-semibold text-gray-700">
+                👁 {{ quiz.view_count }}
+              </span>
+            </div>
+            <div class="mt-6 text-center">
+              <span class="inline-block bg-white text-purple-600 text-sm font-bold px-6 py-3 rounded-full shadow-lg transform transition-transform hover:scale-110">
+                🎮 クイズに挑戦 →
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -60,17 +60,52 @@ export default {
   name: 'IndexPage',
   data() {
     return {
-      // データをここに追加
+      quizzes: [],
+      loading: true
     }
   },
   async mounted() {
-    try {
-      // APIからデータを取得する例
-      // const response = await this.$axios.get('/quizzes')
-      // console.log(response.data)
-    } catch (error) {
-      console.error('Error fetching data:', error)
+    await this.fetchQuizzes()
+  },
+  methods: {
+    async fetchQuizzes() {
+      try {
+        const response = await fetch('http://localhost:8000/api/public/quizzes')
+        const data = await response.json()
+        this.quizzes = data.quizzes || []
+      } catch (error) {
+        console.error('クイズの取得に失敗しました', error)
+      } finally {
+        this.loading = false
+      }
+    },
+    goToQuiz(id) {
+      this.$router.push(`/quizzes/${id}`)
+    },
+    getCardColor(index) {
+      const colors = [
+        'bg-gradient-to-br from-pink-200 to-pink-300',
+        'bg-gradient-to-br from-purple-200 to-purple-300',
+        'bg-gradient-to-br from-blue-200 to-blue-300',
+        'bg-gradient-to-br from-green-200 to-green-300',
+        'bg-gradient-to-br from-yellow-200 to-yellow-300',
+        'bg-gradient-to-br from-red-200 to-red-300'
+      ]
+      return colors[index % colors.length]
+    },
+    getEmoji(index) {
+      const emojis = ['🎯', '🎪', '🎨', '🎭', '🎬', '🎤', '🎸', '🎹', '🎲', '🎮']
+      return emojis[index % emojis.length]
     }
   }
 }
 </script>
+
+<style scoped>
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>

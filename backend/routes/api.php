@@ -16,6 +16,10 @@ use App\Http\Controllers\QuizController;
 |
 */
 
+// 公開API（認証不要）
+Route::get('/public/quizzes', [QuizController::class, 'publicIndex']);
+Route::get('/public/quizzes/{id}', [QuizController::class, 'publicShow']);
+
 // 認証関連
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);

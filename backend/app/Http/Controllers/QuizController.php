@@ -11,6 +11,34 @@ use Illuminate\Support\Facades\DB;
 class QuizController extends Controller
 {
     /**
+     * 公開クイズ一覧取得（認証不要）
+     */
+    public function publicIndex()
+    {
+        $quizzes = Quiz::with('user')
+            ->where('is_published', true)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json(['quizzes' => $quizzes], 200);
+    }
+
+    /**
+     * 公開クイズ詳細取得（認証不要）
+     */
+    public function publicShow($id)
+    {
+        $quiz = Quiz::with(['questions.answers', 'user'])
+            ->where('is_published', true)
+            ->findOrFail($id);
+        
+        // 閲覧数をインクリメント
+        $quiz->increment('view_count');
+        
+        return response()->json(['quiz' => $quiz], 200);
+    }
+
+    /**
      * クイズ一覧取得
      */
     public function index(Request $request)
