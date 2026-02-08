@@ -16,6 +16,7 @@ use App\Http\Controllers\AuthController;
 */
 
 // 認証関連
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 // 認証が必要なルート
