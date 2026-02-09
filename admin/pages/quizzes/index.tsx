@@ -2,6 +2,21 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  IconButton,
+  CircularProgress,
+  Alert,
+} from '@mui/material'
+import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import DashboardLayout from '../../components/Layout/DashboardLayout'
 
 const QuizList: NextPage = () => {
   const router = useRouter()
@@ -59,81 +74,106 @@ const QuizList: NextPage = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6' }}>
+    <DashboardLayout title="クイズ一覧">
       <Head>
         <title>クイズ一覧 - クイズメーカー</title>
       </Head>
 
-      <header style={{ backgroundColor: 'white', borderBottom: '1px solid #e5e7eb', padding: '16px 0' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937' }}>クイズ一覧</h1>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={() => router.push('/quizzes/create')} style={{ padding: '8px 16px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', fontSize: '14px', cursor: 'pointer' }}>
-              + 新規作成
-            </button>
-            <button onClick={() => router.push('/')} style={{ padding: '8px 16px', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', fontSize: '14px', cursor: 'pointer' }}>
-              戻る
-            </button>
-          </div>
-        </div>
-      </header>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" component="h1" fontWeight="bold">
+          クイズ一覧
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => router.push('/quizzes/create')}
+          size="large"
+        >
+          新規作成
+        </Button>
+      </Box>
 
-      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 16px' }}>
-        {isLoading ? (
-          <div style={{ textAlign: 'center', padding: '48px' }}>
-            <p style={{ color: '#6b7280' }}>読み込み中...</p>
-          </div>
-        ) : quizzes.length === 0 ? (
-          <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '48px', textAlign: 'center' }}>
-            <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '16px' }}>クイズがまだありません</p>
-            <button onClick={() => router.push('/quizzes/create')} style={{ padding: '12px 24px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', fontSize: '16px', cursor: 'pointer' }}>
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : quizzes.length === 0 ? (
+        <Card>
+          <CardContent sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              クイズがまだありません
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => router.push('/quizzes/create')}
+              sx={{ mt: 2 }}
+            >
               最初のクイズを作成
-            </button>
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gap: '16px' }}>
-            {quizzes.map((quiz: any) => (
-              <div key={quiz.id} style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {quizzes.map((quiz: any) => (
+            <Card key={quiz.id} sx={{ transition: 'all 0.3s', '&:hover': { boxShadow: 4 } }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom>
                       {quiz.title}
-                    </h3>
+                    </Typography>
                     {quiz.description && (
-                      <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '12px' }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         {quiz.description}
-                      </p>
+                      </Typography>
                     )}
-                    <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#9ca3af' }}>
-                      <span>作成者: {quiz.user?.name}</span>
-                      <span>問題数: {quiz.questions?.length || 0}問</span>
-                      <span>閲覧数: {quiz.view_count}</span>
-                      <span style={{ color: quiz.is_published ? '#10b981' : '#ef4444' }}>
-                        {quiz.is_published ? '公開中' : '非公開'}
-                      </span>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button 
+                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                      <Chip
+                        label={`作成者: ${quiz.user?.name}`}
+                        size="small"
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={`問題数: ${quiz.questions?.length || 0}問`}
+                        size="small"
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={`閲覧数: ${quiz.view_count}`}
+                        size="small"
+                        variant="outlined"
+                      />
+                      <Chip
+                        label={quiz.is_published ? '公開中' : '非公開'}
+                        size="small"
+                        color={quiz.is_published ? 'success' : 'error'}
+                      />
+                    </Box>
+                  </Box>
+                  <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+                    <IconButton
+                      color="primary"
                       onClick={() => router.push(`/quizzes/${quiz.id}`)}
-                      style={{ padding: '6px 12px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}
+                      title="詳細"
                     >
-                      詳細
-                    </button>
-                    <button 
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
                       onClick={() => deleteQuiz(quiz.id)}
-                      style={{ padding: '6px 12px', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', fontSize: '12px', cursor: 'pointer' }}
+                      title="削除"
                     >
-                      削除
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      )}
+    </DashboardLayout>
   )
 }
 
