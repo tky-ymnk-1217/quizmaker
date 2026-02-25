@@ -16,6 +16,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
+import EditIcon from '@mui/icons-material/Edit'
 import DashboardLayout from '../../components/Layout/DashboardLayout'
 
 const QuizList: NextPage = () => {
@@ -158,6 +159,13 @@ const QuizList: NextPage = () => {
                       title="詳細"
                     >
                       <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      color="info"
+                      onClick={() => router.push(`/quizzes/edit/${quiz.id}`)}
+                      title="編集"
+                    >
+                      <EditIcon />
                     </IconButton>
                     <IconButton
                       color="error"

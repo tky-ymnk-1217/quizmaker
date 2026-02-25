@@ -81,6 +81,17 @@
               <span v-if="showAnswers && answer.is_correct" class="text-green-600 font-black text-lg">🎉</span>
             </div>
           </div>
+
+          <!-- 正解の解説 -->
+          <div v-if="showAnswers && question.explanation" class="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded-lg">
+            <div class="flex items-start gap-2">
+              <span class="text-2xl">💡</span>
+              <div class="flex-1">
+                <h4 class="font-bold text-blue-800 mb-1">解説</h4>
+                <p class="text-gray-700">{{ question.explanation }}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 採点ボタン -->

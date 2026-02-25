@@ -70,6 +70,7 @@ class QuizController extends Controller
             'questions.*.question_text' => 'required|string',
             'questions.*.question_type' => 'required|in:multiple_choice,true_false,text',
             'questions.*.points' => 'nullable|integer|min:1',
+            'questions.*.explanation' => 'nullable|string',
             'questions.*.answers' => 'required|array|min:1',
             'questions.*.answers.*.answer_text' => 'required|string',
             'questions.*.answers.*.is_correct' => 'required|boolean',
@@ -95,6 +96,7 @@ class QuizController extends Controller
                     'question_type' => $questionData['question_type'],
                     'order' => $index + 1,
                     'points' => $questionData['points'] ?? 10,
+                    'explanation' => $questionData['explanation'] ?? null,
                 ]);
 
                 foreach ($questionData['answers'] as $answerIndex => $answerData) {
@@ -155,14 +157,63 @@ class QuizController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'is_published' => 'boolean',
+            'questions' => 'required|array|min:1',
+            'questions.*.question_text' => 'required|string',
+            'questions.*.question_type' => 'required|in:multiple_choice,true_false,text',
+            'questions.*.points' => 'nullable|integer|min:1',
+            'questions.*.explanation' => 'nullable|string',
+            'questions.*.answers' => 'required|array|min:1',
+            'questions.*.answers.*.answer_text' => 'required|string',
+            'questions.*.answers.*.is_correct' => 'required|boolean',
         ]);
 
-        $quiz->update($request->only(['title', 'description', 'is_published']));
+        try {
+            DB::beginTransaction();
 
-        return response()->json([
-            'message' => 'クイズを更新しました',
-            'quiz' => $quiz->load(['questions.answers', 'user.role'])
-        ], 200);
+            // クイズの基本情報を更新
+            $quiz->update($request->only(['title', 'description', 'is_published']));
+
+            // 既存の問題と選択肢を削除
+            foreach ($quiz->questions as $question) {
+                $question->answers()->delete();
+            }
+            $quiz->questions()->delete();
+
+            // 新しい問題と選択肢を作成
+            foreach ($request->questions as $index => $questionData) {
+                $question = Question::create([
+                    'quiz_id' => $quiz->id,
+                    'question_text' => $questionData['question_text'],
+                    'question_type' => $questionData['question_type'],
+                    'order' => $index + 1,
+                    'points' => $questionData['points'] ?? 10,
+                    'explanation' => $questionData['explanation'] ?? null,
+                ]);
+
+                foreach ($questionData['answers'] as $answerIndex => $answerData) {
+                    Answer::create([
+                        'question_id' => $question->id,
+                        'answer_text' => $answerData['answer_text'],
+                        'is_correct' => $answerData['is_correct'],
+                        'order' => $answerIndex + 1,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'クイズを更新しました',
+                'quiz' => $quiz->load(['questions.answers', 'user.role'])
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'クイズの更新に失敗しました',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
