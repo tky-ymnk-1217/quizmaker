@@ -14,11 +14,12 @@ import {
   FormControlLabel,
   Alert,
   Divider,
+  CircularProgress,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SaveIcon from '@mui/icons-material/Save'
-import DashboardLayout from '../../components/Layout/DashboardLayout'
+import DashboardLayout from '../../../components/Layout/DashboardLayout'
 
 interface Answer {
   answer_text: string
@@ -33,33 +34,71 @@ interface Question {
   answers: Answer[]
 }
 
-const QuizCreate: NextPage = () => {
+const QuizEdit: NextPage = () => {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const { id } = router.query
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState('')
   
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [isPublished, setIsPublished] = useState(false)
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      question_text: '',
-      question_type: 'multiple_choice',
-      points: 10,
-      explanation: '',
-      answers: [
-        { answer_text: '', is_correct: true },
-        { answer_text: '', is_correct: false }
-      ]
-    }
-  ])
+  const [questions, setQuestions] = useState<Question[]>([])
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token')
     if (!token) {
       router.push('/login')
+      return
     }
-  }, [router])
+
+    if (id) {
+      fetchQuiz()
+    }
+  }, [router, id])
+
+  const fetchQuiz = async () => {
+    try {
+      const token = localStorage.getItem('auth_token')
+      const response = await fetch(`http://localhost:8000/api/quizzes/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('クイズの取得に失敗しました')
+      }
+
+      const data = await response.json()
+      const quiz = data.quiz
+
+      setTitle(quiz.title)
+      setDescription(quiz.description || '')
+      setIsPublished(quiz.is_published)
+      
+      // 問題データを変換
+      const formattedQuestions = quiz.questions.map((q: any) => ({
+        question_text: q.question_text,
+        question_type: q.question_type,
+        points: q.points,
+        explanation: q.explanation || '',
+        answers: q.answers.map((a: any) => ({
+          answer_text: a.answer_text,
+          is_correct: a.is_correct
+        }))
+      }))
+
+      setQuestions(formattedQuestions)
+    } catch (error) {
+      console.error('クイズの取得に失敗しました', error)
+      setError('クイズの取得に失敗しました')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const addQuestion = () => {
     setQuestions([...questions, {
@@ -108,12 +147,12 @@ const QuizCreate: NextPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    setIsLoading(true)
+    setIsSaving(true)
 
     try {
       const token = localStorage.getItem('auth_token')
-      const response = await fetch('http://localhost:8000/api/quizzes', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:8000/api/quizzes/${id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -130,26 +169,42 @@ const QuizCreate: NextPage = () => {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'クイズの作成に失敗しました')
+        throw new Error(data.message || 'クイズの更新に失敗しました')
       }
 
       router.push('/quizzes')
     } catch (err: any) {
-      setError(err.message || 'クイズの作成に失敗しました')
+      setError(err.message || 'クイズの更新に失敗しました')
     } finally {
-      setIsLoading(false)
+      setIsSaving(false)
     }
   }
 
+  if (isLoading) {
+    return (
+      <DashboardLayout title="クイズ編集">
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <CircularProgress />
+        </Box>
+      </DashboardLayout>
+    )
+  }
+
   return (
-    <DashboardLayout title="クイズ作成">
+    <DashboardLayout title="クイズ編集">
       <Head>
-        <title>クイズ作成 - クイズメーカー</title>
+        <title>クイズ編集 - クイズメーカー</title>
       </Head>
 
       <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-        クイズ作成
+        クイズ編集
       </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <form onSubmit={handleSubmit}>
         <Card sx={{ mb: 3 }}>
@@ -300,27 +355,22 @@ const QuizCreate: NextPage = () => {
           問題を追加
         </Button>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button
             type="submit"
             variant="contained"
             size="large"
-            disabled={isLoading}
+            disabled={isSaving}
             startIcon={<SaveIcon />}
             fullWidth
           >
-            {isLoading ? '作成中...' : 'クイズを作成'}
+            {isSaving ? '更新中...' : 'クイズを更新'}
           </Button>
           <Button
             variant="outlined"
             size="large"
             onClick={() => router.push('/quizzes')}
+            disabled={isSaving}
           >
             キャンセル
           </Button>
@@ -330,4 +380,4 @@ const QuizCreate: NextPage = () => {
   )
 }
 
-export default QuizCreate
+export default QuizEdit

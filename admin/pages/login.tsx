@@ -1,8 +1,24 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useState } from 'react'
+import { useRouter } from 'next/router'
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Link,
+  Divider,
+  CircularProgress,
+} from '@mui/material'
+import LoginIcon from '@mui/icons-material/Login'
 
 const Login: NextPage = () => {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -29,12 +45,10 @@ const Login: NextPage = () => {
         throw new Error(data.message || 'ログインに失敗しました')
       }
 
-      // トークンをローカルストレージに保存
       localStorage.setItem('auth_token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      // ダッシュボードにリダイレクト
-      window.location.href = '/'
+      router.push('/')
       
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました')
@@ -44,123 +58,110 @@ const Login: NextPage = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}
+    >
       <Head>
         <title>ログイン - クイズメーカー管理画面</title>
         <meta name="description" content="クイズメーカー管理画面ログイン" />
       </Head>
 
-      <div style={{ width: '100%', maxWidth: '400px', padding: '20px' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '32px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px', color: '#1f2937' }}>
-            クイズメーカー
-          </h1>
-          <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '24px' }}>
-            管理画面ログイン
-          </p>
+      <Container maxWidth="sm">
+        <Card sx={{ boxShadow: 6 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <LoginIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+                クイズメーカー
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                管理画面ログイン
+              </Typography>
+            </Box>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '16px' }}>
-              <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                メールアドレス
-              </label>
-              <input
-                id="email"
+            <form onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label="メールアドレス"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@quizmaker.co.jp"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                margin="normal"
+                autoComplete="email"
               />
-            </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label htmlFor="password" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                パスワード
-              </label>
-              <input
-                id="password"
+              <TextField
+                fullWidth
+                label="パスワード"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                margin="normal"
+                autoComplete="current-password"
               />
-            </div>
 
-            {error && (
-              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '4px' }}>
-                <p style={{ color: '#dc2626', fontSize: '14px' }}>{error}</p>
-              </div>
-            )}
+              {error && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {error}
+                </Alert>
+              )}
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '10px',
-                backgroundColor: isLoading ? '#9ca3af' : '#3b82f6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: isLoading ? 'not-allowed' : 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = '#2563eb'
-              }}
-              onMouseLeave={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = '#3b82f6'
-              }}
-            >
-              {isLoading ? 'ログイン中...' : 'ログイン'}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={isLoading}
+                sx={{ mt: 3, mb: 2, py: 1.5 }}
+                startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+              >
+                {isLoading ? 'ログイン中...' : 'ログイン'}
+              </Button>
+            </form>
 
-          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
-            <p style={{ fontSize: '14px', color: '#6b7280', textAlign: 'center' }}>
-              アカウントをお持ちでない方
-            </p>
-            <p style={{ fontSize: '14px', textAlign: 'center', marginTop: '8px' }}>
-              <a href="/register" style={{ color: '#10b981', textDecoration: 'none', fontWeight: '500' }}>
+            <Divider sx={{ my: 3 }} />
+
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                アカウントをお持ちでない方
+              </Typography>
+              <Link
+                href="/register"
+                underline="hover"
+                sx={{ fontWeight: 500, cursor: 'pointer' }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  router.push('/register')
+                }}
+              >
                 新規登録はこちら
-              </a>
-            </p>
-          </div>
-        </div>
+              </Link>
+            </Box>
+          </CardContent>
+        </Card>
 
-        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#eff6ff', borderRadius: '4px', border: '1px solid #dbeafe' }}>
-          <p style={{ fontSize: '12px', color: '#1e40af', textAlign: 'center', fontWeight: '500' }}>
-            デフォルト管理者アカウント
-          </p>
-          <p style={{ fontSize: '11px', color: '#3b82f6', textAlign: 'center', marginTop: '4px' }}>
-            Email: admin@quizmaker.co.jp / Password: password
-          </p>
-        </div>
-      </div>
-    </div>
+        <Card sx={{ mt: 2, bgcolor: 'info.light' }}>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Typography variant="caption" fontWeight="bold" display="block" gutterBottom>
+              デフォルト管理者アカウント
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Email: admin@quizmaker.co.jp / Password: password
+            </Typography>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   )
 }
 

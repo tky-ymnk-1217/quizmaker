@@ -2,6 +2,20 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import {
+  Container,
+  Box,
+  Card,
+  CardContent,
+  TextField,
+  Button,
+  Typography,
+  Alert,
+  Link,
+  Divider,
+  CircularProgress,
+} from '@mui/material'
+import PersonAddIcon from '@mui/icons-material/PersonAdd'
 
 const Register: NextPage = () => {
   const router = useRouter()
@@ -35,7 +49,6 @@ const Register: NextPage = () => {
       const data = await response.json()
 
       if (!response.ok) {
-        // バリデーションエラーの処理
         if (data.errors) {
           const errorMessages = Object.values(data.errors).flat().join('\n')
           throw new Error(errorMessages)
@@ -43,11 +56,9 @@ const Register: NextPage = () => {
         throw new Error(data.message || '登録に失敗しました')
       }
 
-      // トークンをローカルストレージに保存
       localStorage.setItem('auth_token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      // ダッシュボードにリダイレクト
       router.push('/')
       
     } catch (err: any) {
@@ -58,170 +69,133 @@ const Register: NextPage = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f3f4f6' }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      }}
+    >
       <Head>
         <title>新規登録 - クイズメーカー管理画面</title>
         <meta name="description" content="クイズメーカー 新規ユーザー登録" />
       </Head>
 
-      <div style={{ width: '100%', maxWidth: '480px', padding: '20px' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', padding: '32px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: 'bold', textAlign: 'center', marginBottom: '8px', color: '#1f2937' }}>
-            クイズメーカー
-          </h1>
-          <p style={{ textAlign: 'center', color: '#6b7280', marginBottom: '24px' }}>
-            クイズ作成者 新規登録
-          </p>
+      <Container maxWidth="sm">
+        <Card sx={{ boxShadow: 6 }}>
+          <CardContent sx={{ p: 4 }}>
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <PersonAddIcon sx={{ fontSize: 48, color: 'success.main', mb: 2 }} />
+              <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+                クイズメーカー
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                クイズ作成者 新規登録
+              </Typography>
+            </Box>
 
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '16px' }}>
-              <label htmlFor="name" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                名前
-              </label>
-              <input
-                id="name"
+            <form onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label="名前"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="山田太郎"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                margin="normal"
               />
-            </div>
 
-            <div style={{ marginBottom: '16px' }}>
-              <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                メールアドレス
-              </label>
-              <input
-                id="email"
+              <TextField
+                fullWidth
+                label="メールアドレス"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="example@example.com"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                margin="normal"
+                autoComplete="email"
               />
-            </div>
 
-            <div style={{ marginBottom: '16px' }}>
-              <label htmlFor="password" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                パスワード（8文字以上）
-              </label>
-              <input
-                id="password"
+              <TextField
+                fullWidth
+                label="パスワード（8文字以上）"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={8}
+                inputProps={{ minLength: 8 }}
                 placeholder="••••••••"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                margin="normal"
+                autoComplete="new-password"
               />
-            </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <label htmlFor="password_confirmation" style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                パスワード（確認）
-              </label>
-              <input
-                id="password_confirmation"
+              <TextField
+                fullWidth
+                label="パスワード（確認）"
                 type="password"
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 required
-                minLength={8}
+                inputProps={{ minLength: 8 }}
                 placeholder="••••••••"
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  outline: 'none'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                margin="normal"
+                autoComplete="new-password"
               />
-            </div>
 
-            {error && (
-              <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '4px' }}>
-                <p style={{ color: '#dc2626', fontSize: '14px', whiteSpace: 'pre-line' }}>{error}</p>
-              </div>
-            )}
+              {error && (
+                <Alert severity="error" sx={{ mt: 2, whiteSpace: 'pre-line' }}>
+                  {error}
+                </Alert>
+              )}
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              style={{
-                width: '100%',
-                padding: '10px',
-                backgroundColor: isLoading ? '#9ca3af' : '#10b981',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '16px',
-                fontWeight: '500',
-                cursor: isLoading ? 'not-allowed' : 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = '#059669'
-              }}
-              onMouseLeave={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = '#10b981'
-              }}
-            >
-              {isLoading ? '登録中...' : '新規登録'}
-            </button>
-          </form>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                color="success"
+                disabled={isLoading}
+                sx={{ mt: 3, mb: 2, py: 1.5 }}
+                startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+              >
+                {isLoading ? '登録中...' : '新規登録'}
+              </Button>
+            </form>
 
-          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
-            <p style={{ fontSize: '14px', color: '#6b7280', textAlign: 'center' }}>
-              すでにアカウントをお持ちですか？
-            </p>
-            <p style={{ fontSize: '14px', textAlign: 'center', marginTop: '8px' }}>
-              <a href="/login" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}>
+            <Divider sx={{ my: 3 }} />
+
+            <Box sx={{ textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                すでにアカウントをお持ちですか？
+              </Typography>
+              <Link
+                href="/login"
+                underline="hover"
+                sx={{ fontWeight: 500, cursor: 'pointer' }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  router.push('/login')
+                }}
+              >
                 ログインはこちら
-              </a>
-            </p>
-          </div>
-        </div>
+              </Link>
+            </Box>
+          </CardContent>
+        </Card>
 
-        <div style={{ marginTop: '16px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', color: '#9ca3af' }}>
-            登録すると「クイズ作成者」権限が付与されます
-          </p>
-        </div>
-      </div>
-    </div>
+        <Card sx={{ mt: 2, bgcolor: 'info.light' }}>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Typography variant="caption" color="text.secondary">
+              登録すると「クイズ作成者」権限が付与されます
+            </Typography>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   )
 }
 
