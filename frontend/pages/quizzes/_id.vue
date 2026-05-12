@@ -161,7 +161,8 @@ export default {
     async fetchQuiz() {
       try {
         const id = this.$route.params.id
-        const response = await fetch(`http://localhost:8000/api/public/quizzes/${id}`)
+        const apiBaseUrl = this.$config.apiBaseUrl || '/api'
+        const response = await fetch(`${apiBaseUrl}/public/quizzes/${id}`)
         const data = await response.json()
         this.quiz = data.quiz
       } catch (error) {

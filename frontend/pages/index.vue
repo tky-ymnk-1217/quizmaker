@@ -70,7 +70,8 @@ export default {
   methods: {
     async fetchQuizzes() {
       try {
-        const response = await fetch('http://localhost:8000/api/public/quizzes')
+        const apiBaseUrl = this.$config.apiBaseUrl || '/api'
+        const response = await fetch(`${apiBaseUrl}/public/quizzes`)
         const data = await response.json()
         this.quizzes = data.quizzes || []
       } catch (error) {

@@ -14,9 +14,8 @@ yarn-error.log*
 dist
 
 # env files
-.env
-.env.*
-!.env.example
+.env.development
+.env.local
 
 # OS
 .DS_Store
