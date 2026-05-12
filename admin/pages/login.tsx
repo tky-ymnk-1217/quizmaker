@@ -16,6 +16,7 @@ import {
   CircularProgress,
 } from '@mui/material'
 import LoginIcon from '@mui/icons-material/Login'
+import api from '../lib/api'
 
 const Login: NextPage = () => {
   const router = useRouter()
@@ -30,18 +31,9 @@ const Login: NextPage = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      })
+      const data = await api.login(email, password)
 
-      const data = await response.json()
-
-      if (!response.ok) {
+      if (data.error || !data.token) {
         throw new Error(data.message || 'ログインに失敗しました')
       }
 

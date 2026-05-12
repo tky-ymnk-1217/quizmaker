@@ -16,6 +16,7 @@ import {
   CircularProgress,
 } from '@mui/material'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import api from '../lib/api'
 
 const Register: NextPage = () => {
   const router = useRouter()
@@ -32,27 +33,14 @@ const Register: NextPage = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8000/api/register', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ 
-          name, 
-          email, 
-          password,
-          password_confirmation: passwordConfirmation
-        })
-      })
+      const data = await api.register(name, email, password, passwordConfirmation)
 
-      const data = await response.json()
+      if (data.errors) {
+        const errorMessages = Object.values(data.errors).flat().join('\n')
+        throw new Error(errorMessages)
+      }
 
-      if (!response.ok) {
-        if (data.errors) {
-          const errorMessages = Object.values(data.errors).flat().join('\n')
-          throw new Error(errorMessages)
-        }
+      if (data.error || !data.token) {
         throw new Error(data.message || '登録に失敗しました')
       }
 

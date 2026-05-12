@@ -18,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
 import DashboardLayout from '../../components/Layout/DashboardLayout'
+import api from '../../lib/api'
 
 const QuizList: NextPage = () => {
   const router = useRouter()
@@ -36,15 +37,7 @@ const QuizList: NextPage = () => {
 
   const fetchQuizzes = async () => {
     try {
-      const token = localStorage.getItem('auth_token')
-      const response = await fetch('http://localhost:8000/api/quizzes', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      })
-
-      const data = await response.json()
+      const data = await api.getQuizzes()
       setQuizzes(data.quizzes || [])
     } catch (error) {
       console.error('クイズの取得に失敗しました', error)
@@ -57,15 +50,7 @@ const QuizList: NextPage = () => {
     if (!confirm('本当にこのクイズを削除しますか？')) return
 
     try {
-      const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/api/quizzes/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      })
-
+      const response = await api.deleteQuiz(id)
       if (response.ok) {
         fetchQuizzes()
       }
