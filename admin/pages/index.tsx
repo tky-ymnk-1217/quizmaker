@@ -86,7 +86,7 @@ const Home: NextPage = () => {
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card
             sx={{
               cursor: 'pointer',
@@ -136,7 +136,7 @@ const Home: NextPage = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card 
             sx={{ 
               opacity: 0.7,
@@ -179,7 +179,7 @@ const Home: NextPage = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <Card 
             sx={{ 
               opacity: 0.7,
@@ -225,7 +225,7 @@ const Home: NextPage = () => {
 
       <Box sx={{ mt: 4 }}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Card>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -252,7 +252,7 @@ const Home: NextPage = () => {
             </Card>
           </Grid>
           
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Card>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
