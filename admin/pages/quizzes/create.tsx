@@ -19,6 +19,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SaveIcon from '@mui/icons-material/Save'
 import DashboardLayout from '../../components/Layout/DashboardLayout'
+import { api } from '../../lib/api'
 
 interface Answer {
   answer_text: string
@@ -111,25 +112,14 @@ const QuizCreate: NextPage = () => {
     setIsLoading(true)
 
     try {
-      const token = localStorage.getItem('auth_token')
-      const response = await fetch('http://localhost:8000/api/quizzes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          is_published: isPublished,
-          questions
-        })
+      const data = await api.createQuiz({
+        title,
+        description,
+        is_published: isPublished,
+        questions
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
+      if (data.error) {
         throw new Error(data.message || 'クイズの作成に失敗しました')
       }
 

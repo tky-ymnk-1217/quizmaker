@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import SaveIcon from '@mui/icons-material/Save'
 import DashboardLayout from '../../../components/Layout/DashboardLayout'
+import { api } from '../../../lib/api'
 
 interface Answer {
   answer_text: string
@@ -60,19 +61,7 @@ const QuizEdit: NextPage = () => {
 
   const fetchQuiz = async () => {
     try {
-      const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/api/quizzes/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error('クイズの取得に失敗しました')
-      }
-
-      const data = await response.json()
+      const data = await api.getQuiz(Number(id))
       const quiz = data.quiz
 
       setTitle(quiz.title)
@@ -150,25 +139,14 @@ const QuizEdit: NextPage = () => {
     setIsSaving(true)
 
     try {
-      const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/api/quizzes/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          title,
-          description,
-          is_published: isPublished,
-          questions
-        })
+      const data = await api.updateQuiz(Number(id), {
+        title,
+        description,
+        is_published: isPublished,
+        questions
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
+      if (data.error) {
         throw new Error(data.message || 'クイズの更新に失敗しました')
       }
 
