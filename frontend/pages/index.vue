@@ -32,7 +32,7 @@
             <h2 class="text-2xl font-black text-gray-800 mb-3 relative z-10">
               {{ quiz.title }}
             </h2>
-            <p v-if="quiz.description" class="text-gray-700 text-sm mb-4 line-clamp-2 relative z-10">
+            <p v-if="quiz.description" class="text-gray-700 text-sm mb-4 line-clamp-2 relative z-10 whitespace-pre-line">
               {{ quiz.description }}
             </p>
             <div class="flex items-center justify-between text-sm mb-4">
