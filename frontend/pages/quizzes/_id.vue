@@ -18,7 +18,7 @@
           <div class="flex items-start justify-between">
             <div class="flex-1">
               <h2 class="text-3xl font-black text-gray-800 mb-3">📚 {{ quiz.title }}</h2>
-              <p v-if="quiz.description" class="text-gray-700 text-lg mb-4">{{ quiz.description }}</p>
+              <p v-if="quiz.description" class="text-gray-700 text-lg mb-4 whitespace-pre-line">{{ quiz.description }}</p>
             </div>
             <div class="text-5xl ml-4">🎯</div>
           </div>
@@ -48,7 +48,7 @@
               ⭐ {{ question.points }}点
             </span>
           </div>
-          <p class="text-gray-800 text-lg mb-6 font-semibold bg-purple-50 p-4 rounded-2xl">{{ question.question_text }}</p>
+          <p class="text-gray-800 text-lg mb-6 font-semibold bg-purple-50 p-4 rounded-2xl whitespace-pre-line">{{ question.question_text }}</p>
 
           <div class="space-y-3">
             <div
@@ -88,7 +88,7 @@
               <span class="text-2xl">💡</span>
               <div class="flex-1">
                 <h4 class="font-bold text-blue-800 mb-1">解説</h4>
-                <p class="text-gray-700">{{ question.explanation }}</p>
+                <p class="text-gray-700 whitespace-pre-line">{{ question.explanation }}</p>
               </div>
             </div>
           </div>
